@@ -1,73 +1,59 @@
-import React, { Component } from 'react'
-import { Table, Button } from 'reactstrap';
-import ModalForm from '../Modals/Modal'
+import React, { Component } from "react";
+import { Table, Button } from "reactstrap";
+import ModalForm from "../Modals/Modal";
 
 class DataTable extends Component {
-
   deleteItem = id => {
-    let confirmDelete = window.confirm('Delete item forever?')
-    if(confirmDelete){
-      fetch('http://localhost:3000/crud', {
-      method: 'delete',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id
+    let confirmDelete = window.confirm("Delete item forever?");
+    if (confirmDelete) {
+      fetch("http://localhost:9000/produit/delete/" + id, {
+        method: "delete",
+        headers: {
+          "Content-Type": "application/json"
+        }
       })
-    })
-      .then(response => response.json())
-      .then(item => {
-        this.props.deleteItemFromState(id)
-      })
-      .catch(err => console.log(err))
+        .then(response => this.props.updateState())
+        .catch(err => console.log(err));
     }
-
-  }
+  };
 
   render() {
-
-    const items = this.props.items.map(item => {
+    const items = this.props.items.map((item, id) => {
       return (
-        <tr key={item.id}>
-          <th scope="row">{item.id}</th>
-          <td>{item.first}</td>
-          <td>{item.last}</td>
-          <td>{item.email}</td>
-          <td>{item.phone}</td>
-          <td>{item.location}</td>
-          <td>{item.hobby}</td>
+        <tr key={id}>
+          <th scope="row">{item.produitId}</th>
+          <td>{item.designation}</td>
           <td>
-            <div style={{width:"110px"}}>
-              <ModalForm buttonLabel="Edit" item={item} updateState={this.props.updateState}/>
-              {' '}
-              <Button color="danger" onClick={() => this.deleteItem(item.id)}>Del</Button>
+            <div style={{ width: "110px" }}>
+              <ModalForm
+                buttonLabel="Modifier"
+                item={item}
+                updateState={this.props.updateState}
+              />{" "}
+              <Button
+                color="danger"
+                onClick={() => this.deleteItem(item.produitId)}
+              >
+                Supprimer
+              </Button>
             </div>
           </td>
         </tr>
-        )
-      })
+      );
+    });
 
     return (
       <Table responsive hover>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>First</th>
-            <th>Last</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Location</th>
-            <th>Hobby</th>
-            <th>Actions</th>
+            <th>ID produit</th>
+            <th>Designation</th>
           </tr>
         </thead>
-        <tbody>
-          {items}
-        </tbody>
+        <tbody>{items}</tbody>
       </Table>
-    )
+    );
   }
 }
 
-export default DataTable
+export default DataTable;

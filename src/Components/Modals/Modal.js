@@ -1,62 +1,80 @@
-import React, { Component } from 'react'
-import { Button, Modal, ModalHeader, ModalBody } from 'reactstrap'
-import AddEditForm from '../Forms/FormAddEdit'
+import React, { Component } from "react";
+import { Button, Modal, ModalHeader, ModalBody } from "reactstrap";
+import AddEditForm from "../Forms/FormAddEdit";
 
 class ModalForm extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       modal: false
-    }
+    };
   }
 
   toggle = () => {
     this.setState(prevState => ({
       modal: !prevState.modal
-    }))
-  }
+    }));
+  };
 
   render() {
-      const closeBtn = <button className="close" onClick={this.toggle}>&times;</button>
+    const closeBtn = (
+      <button className="close" onClick={this.toggle}>
+        &times;
+      </button>
+    );
 
-      const label = this.props.buttonLabel
+    const label = this.props.buttonLabel;
 
-      let button = ''
-      let title = ''
+    let button = "";
+    let title = "";
 
-      if(label === 'Edit'){
-        button = <Button
-                  color="warning"
-                  onClick={this.toggle}
-                  style={{float: "left", marginRight:"10px"}}>{label}
-                </Button>
-        title = 'Edit Item'
-      } else {
-        button = <Button
-                  color="success"
-                  onClick={this.toggle}
-                  style={{float: "left", marginRight:"10px"}}>{label}
-                </Button>
-        title = 'Add New Item'
-      }
+    if (label === "Modifier") {
+      button = (
+        <Button
+          color="warning"
+          onClick={this.toggle}
+          style={{ float: "left", marginRight: "10px" }}
+        >
+          {label}
+        </Button>
+      );
+      title = "Modifier un produit";
+    } else {
+      button = (
+        <Button
+          color="success"
+          onClick={this.toggle}
+          style={{ float: "left", marginRight: "10px" }}
+        >
+          {label}
+        </Button>
+      );
+      title = "Ajouter un nouveau produit";
+    }
 
-
-      return (
+    return (
       <div>
         {button}
-        <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-          <ModalHeader toggle={this.toggle} close={closeBtn}>{title}</ModalHeader>
+        <Modal
+          isOpen={this.state.modal}
+          toggle={this.toggle}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle} close={closeBtn}>
+            {title}
+          </ModalHeader>
           <ModalBody>
             <AddEditForm
-              addItemToState={this.props.addItemToState}
               updateState={this.props.updateState}
               toggle={this.toggle}
-              item={this.props.item} />
+              item={this.props.item}
+              label={label}
+            />
           </ModalBody>
         </Modal>
       </div>
-    )
+    );
   }
 }
 
-export default ModalForm
+export default ModalForm;

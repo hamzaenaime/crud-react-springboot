@@ -1,118 +1,114 @@
-import React from 'react';
-import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
+import React from "react";
+import { Button, Form, FormGroup, Label, Input } from "reactstrap";
+import SimpleSnackbar from "../Snackbar/Snackbar";
 
 class AddEditForm extends React.Component {
   state = {
-    id: 0,
-    first: '',
-    last: '',
-    email: '',
-    phone: '',
-    location: '',
-    hobby: ''
-  }
+    produitId: "",
+    designation: ""
+  };
+  child = React.createRef();
 
   onChange = e => {
-    this.setState({[e.target.name]: e.target.value})
-  }
+    this.setState({ [e.target.name]: e.target.value });
+  };
 
   submitFormAdd = e => {
-    e.preventDefault()
-    fetch('http://localhost:3000/crud', {
-      method: 'post',
+    e.preventDefault();
+    fetch("http://localhost:9000/produit/add", {
+      method: "post",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        first: this.state.first,
-        last: this.state.last,
-        email: this.state.email,
-        phone: this.state.phone,
-        location: this.state.location,
-        hobby: this.state.hobby
+        produitId: this.state.produitId,
+        designation: this.state.designation
       })
     })
-      .then(response => response.json())
-      .then(item => {
-        if(Array.isArray(item)) {
-          this.props.addItemToState(item[0])
-          this.props.toggle()
+      .then(response => {
+        if (response.status === 500) {
+          this.child.handleOpen(
+            "Le produit avec id ::" + this.state.produitId + " existe deja",
+            "error"
+          );
         } else {
-          console.log('failure')
+          this.props.updateState();
+          this.props.toggle();
         }
       })
-      .catch(err => console.log(err))
-  }
+
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   submitFormEdit = e => {
-    e.preventDefault()
-    fetch('http://localhost:3000/crud', {
-      method: 'put',
+    e.preventDefault();
+    fetch("http://localhost:9000/produit/update/" + this.state.produitId, {
+      method: "post",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        id: this.state.id,
-        first: this.state.first,
-        last: this.state.last,
-        email: this.state.email,
-        phone: this.state.phone,
-        location: this.state.location,
-        hobby: this.state.hobby
+        designation: this.state.designation
       })
     })
-      .then(response => response.json())
-      .then(item => {
-        if(Array.isArray(item)) {
-          // console.log(item[0])
-          this.props.updateState(item[0])
-          this.props.toggle()
-        } else {
-          console.log('failure')
-        }
+      .then(response => {
+        this.props.updateState();
+        this.props.toggle();
       })
-      .catch(err => console.log(err))
-  }
+      .catch(err => console.log(err));
+  };
 
-  componentDidMount(){
+  componentDidMount() {
     // if item exists, populate the state with proper data
-    if(this.props.item){
-      const { id, first, last, email, phone, location, hobby } = this.props.item
-      this.setState({ id, first, last, email, phone, location, hobby })
+    if (this.props.item) {
+      const { produitId, designation } = this.props.item;
+      this.setState({ produitId, designation });
     }
   }
 
   render() {
+    const label = this.props.item ? "Modifier" : "Ajouter";
     return (
-      <Form onSubmit={this.props.item ? this.submitFormEdit : this.submitFormAdd}>
+      <Form
+        onSubmit={this.props.item ? this.submitFormEdit : this.submitFormAdd}
+      >
         <FormGroup>
-          <Label for="first">First Name</Label>
-          <Input type="text" name="first" id="first" onChange={this.onChange} value={this.state.first === null ? '' : this.state.first} />
+          <Label for="produitId">Id produit</Label>
+          <Input
+            type="text"
+            name="produitId"
+            id="produitId"
+            disabled={label === "Modifier"}
+            onChange={this.onChange}
+            value={this.state.produitId === null ? "" : this.state.produitId}
+          />
         </FormGroup>
         <FormGroup>
-          <Label for="last">Last Name</Label>
-          <Input type="text" name="last" id="last" onChange={this.onChange} value={this.state.last === null ? '' : this.state.last}  />
+          <Label for="designation">Designation</Label>
+          <Input
+            type="text"
+            name="designation"
+            id="designation"
+            onChange={this.onChange}
+            value={
+              this.state.designation === null ? "" : this.state.designation
+            }
+          />
         </FormGroup>
-        <FormGroup>
-          <Label for="email">Email</Label>
-          <Input type="email" name="email" id="email" onChange={this.onChange} value={this.state.email === null ? '' : this.state.email}  />
-        </FormGroup>
-        <FormGroup>
-          <Label for="phone">Phone</Label>
-          <Input type="text" name="phone" id="phone" onChange={this.onChange} value={this.state.phone === null ? '' : this.state.phone}  placeholder="ex. 555-555-5555" />
-        </FormGroup>
-        <FormGroup>
-          <Label for="location">Location</Label>
-          <Input type="text" name="location" id="location" onChange={this.onChange} value={this.state.location === null ? '' : this.state.location}  placeholder="City, State" />
-        </FormGroup>
-        <FormGroup>
-          <Label for="hobby">Hobby</Label>
-          <Input type="text" name="hobby" id="hobby" onChange={this.onChange} value={this.state.hobby}  />
-        </FormGroup>
-        <Button>Submit</Button>
+        <Button>{label}</Button>
+        <SimpleSnackbar
+          variant={"error"}
+          message={"success"}
+          ref={ti => {
+            this.child = ti;
+          }}
+          childRef={ref => (this.child = ref)}
+        />
       </Form>
     );
   }
 }
 
-export default AddEditForm
+export default AddEditForm;
